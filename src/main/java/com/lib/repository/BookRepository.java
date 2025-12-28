@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.lib.entity.Book;
 
 @Repository
-public interface BookRepositort extends JpaRepository<Book, Long>{
+public interface BookRepository extends JpaRepository<Book, Long>{
 
 	List<Book> findByCategory(String category);
 	
