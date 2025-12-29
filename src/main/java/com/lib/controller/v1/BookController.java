@@ -36,8 +36,8 @@ public class BookController {
 	}
 
 	@DeleteMapping("/{bookId}")
-	ResponseEntity<String> deleteBook(@PathVariable Long bookid) {
-		return bookservice.deleteBook(bookid) ? ResponseEntity.ok("Book deleted successfully")
+	ResponseEntity<String> deleteBook(@PathVariable Long bookId) {
+		return bookservice.deleteBook(bookId) ? ResponseEntity.ok("Book deleted successfully")
 				: ResponseEntity.badRequest().body("Book not found");
 
 	}
@@ -65,7 +65,7 @@ public class BookController {
 	}
 
 	@GetMapping("/{bookId}/available")
-	ResponseEntity<Boolean> isBookAvailable(Long bookId) {
+	ResponseEntity<Boolean> isBookAvailable(@PathVariable Long bookId) {
 		return ResponseEntity.ok(bookservice.isBookAvailable(bookId));
 	}
 

@@ -29,26 +29,42 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public Book addBook(Book book) {
+		
+		boolean exists = bookRepository
+				.findByNameAndAuthorAndCategory(book.getName(), book.getAuthor(), book.getCategory()).isPresent();
+		if (exists) {
+			throw new RuntimeException("Book already exists with same name and author. Use UPDATE to add stock.");
+		}
 		book.setAvailableQuantity(book.getTotalQuantity());
 		book.setStatus(BookStatus.AVAILABLE);
+		
 		return bookRepository.save(book);
 	}
 
 	@Override
 	public Book updateBook(Book book) {
+
 		Book existing = bookRepository.findById(book.getId()).orElseThrow(() -> new RuntimeException("Book not found"));
 
+		int oldTotal = existing.getTotalQuantity();
+		int oldAvailable = existing.getAvailableQuantity();
+		int issuedCount = oldTotal - oldAvailable;
+		int newTotal = book.getTotalQuantity();
+		if (newTotal < issuedCount) {
+			throw new RuntimeException("Total quantity cannot be less than already issued books");
+		}
 		existing.setName(book.getName());
 		existing.setAuthor(book.getAuthor());
 		existing.setCategory(book.getCategory());
 		existing.setContent(book.getContent());
-		existing.setTotalQuantity(book.getTotalQuantity());
+		existing.setTotalQuantity(newTotal);
+		existing.setAvailableQuantity(newTotal - issuedCount);
 
-		// adjust available quantity safely
-		if (existing.getAvailableQuantity() > book.getTotalQuantity()) {
-			existing.setAvailableQuantity(book.getTotalQuantity());
+		if (existing.getAvailableQuantity() > 0) {
+			existing.setStatus(BookStatus.AVAILABLE);
+		} else {
+			existing.setStatus(BookStatus.NOT_AVAILABLE);
 		}
-
 		return bookRepository.save(existing);
 	}
 
