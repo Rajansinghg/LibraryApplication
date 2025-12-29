@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.lib.entity.User;
 import com.lib.enums.UserType;
+import com.lib.exception.InvalidOperationException;
 import com.lib.repository.UserRepository;
 import com.lib.service.UserService;
 
@@ -30,7 +31,7 @@ public class UserServiceImpl implements UserService {
 	public User updateUser(User user) {
 
 		User existingUser = userRepository.findById(user.getId())
-				.orElseThrow(() -> new RuntimeException("User not found"));
+				.orElseThrow(() -> new InvalidOperationException("User not found"));
 
 		existingUser.setName(user.getName());
 		existingUser.setEmail(user.getEmail());
@@ -50,7 +51,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public User getUserById(Long userId) {
 		// TODO Auto-generated method stub
-		return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+		return userRepository.findById(userId).orElseThrow(() -> new InvalidOperationException("User not found"));
 	}
 
 	@Override

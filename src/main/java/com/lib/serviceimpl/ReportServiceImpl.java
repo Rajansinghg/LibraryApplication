@@ -11,6 +11,7 @@ import com.lib.dto.IssuedBookResponse;
 import com.lib.entity.BookRecord;
 import com.lib.entity.User;
 import com.lib.enums.TransactionStatus;
+import com.lib.exception.InvalidOperationException;
 import com.lib.repository.BookRecordRepository;
 import com.lib.repository.UserRepository;
 import com.lib.service.ReportService;
@@ -37,7 +38,7 @@ public class ReportServiceImpl implements ReportService {
 	@Override
 	public List<IssuedBookResponse> getIssuedBooksForUserInLastDays(Long userId, int days) {
 
-		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+		User user = userRepository.findById(userId).orElseThrow(() -> new InvalidOperationException("User not found"));
 		LocalDate fromDate = LocalDate.now().minusDays(days);
 		return bookRecordRepository.findByUserAndStatusAndIssueDateAfter(user, TransactionStatus.ISSUED, fromDate)
 				.stream().map(this::mapToDto).toList();

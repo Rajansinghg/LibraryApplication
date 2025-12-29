@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.lib.entity.User;
 import com.lib.enums.UserType;
+import com.lib.exception.InvalidOperationException;
 import com.lib.repository.UserRepository;
 import com.lib.service.MembershipService;
 
@@ -26,7 +27,7 @@ public class MembershipServiceImpl implements MembershipService {
 	@Override
 	public void startMembership(User user, int months) {
 		if (months <= 0) {
-			throw new IllegalArgumentException("Membership months must be greater than zero");
+			throw new InvalidOperationException("Membership months must be greater than zero");
 		}
 		LocalDateTime now = LocalDateTime.now();
 		if (user.getMembershipEndTime() != null && user.getMembershipEndTime().isAfter(now)) {
@@ -46,7 +47,7 @@ public class MembershipServiceImpl implements MembershipService {
 	public void renewMembership(User user, int months) {
 
 	    if (months <= 0) {
-	        throw new IllegalArgumentException("Renewal months must be greater than zero");
+	        throw new InvalidOperationException("Renewal months must be greater than zero");
 	    }
 
 	    LocalDateTime now = LocalDateTime.now();
@@ -54,7 +55,7 @@ public class MembershipServiceImpl implements MembershipService {
 	    if (user.getMembershipEndTime() == null ||
 	        user.getMembershipEndTime().isBefore(now)) {
 
-	        throw new IllegalStateException("Cannot renew expired membership. Start new membership instead.");
+	        throw new InvalidOperationException("Cannot renew expired membership. Start new membership instead.");
 	    }
 
 	    user.setMembershipEndTime(user.getMembershipEndTime().plusMonths(months));
