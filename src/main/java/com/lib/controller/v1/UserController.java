@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lib.dto.LoginRequest;
 import com.lib.entity.User;
 import com.lib.service.UserService;
 
@@ -35,6 +36,11 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(user));
     }
 
+    @PostMapping("/login")
+    public String login(@RequestBody LoginRequest request) {
+        return userService.login(request.getEmail(), request.getPassword());
+    }
+    
     @DeleteMapping("/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
         boolean deleted = userService.deleteUser(userId);

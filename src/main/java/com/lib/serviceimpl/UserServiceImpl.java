@@ -1,7 +1,7 @@
 package com.lib.serviceimpl;
 
 import java.util.List;
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.lib.entity.User;
@@ -15,17 +15,35 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    private final PasswordEncoder passwordEncoder;
 	private final UserRepository userRepository;
+
+   
 
 	@Override
 	public User createUser(User user) {
 
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		user.setUserType(UserType.GUEST); // default
 		user.setMembershipStartTime(null);
 		user.setMembershipEndTime(null);
 
 		return userRepository.save(user);
 	}
+	
+	@Override
+	public String login(String email, String password) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new InvalidOperationException("Invalid credentials"));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new InvalidOperationException("Invalid password");
+        }
+
+        return "Login successful";
+    }
 
 	@Override
 	public User updateUser(User user) {
@@ -42,8 +60,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean deleteUser(Long userId) {
 		if (!userRepository.existsById(userId)) {
-	        return false;
-	    }
+			return false;
+		}
 		userRepository.deleteById(userId);
 		return true;
 	}
